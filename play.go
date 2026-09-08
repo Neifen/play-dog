@@ -1,0 +1,192 @@
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+func (p *Player) isDone() bool {
+	for _, m := range p.Marbles {
+		if m.Position.PositionType != Heaven {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (p *Player) hasWon() bool {
+	return p.isDone() && p.Partner.isDone()
+}
+
+func (p *Position) moveFrom(m *Marble) error {
+	if p.Marble != m {
+		return fmt.Errorf("Marble %s was not on position %s", m, p)
+	}
+
+	p.Marble = nil
+	return nil
+}
+
+func (p *Position) moveTo(m *Marble) error {
+	if p.Marble != nil && p.Marble.isBlocking() {
+		return fmt.Errorf("Marble %s is blocking position %s for Marble %s", p.Marble, p, m)
+	} else if p.Marble != nil {
+		p.Marble.sendHome()
+	}
+
+	p.Marble = m
+	m.Position = p
+	return nil
+}
+
+func (p *Position) moveVia(m *Marble, seven bool) error {
+	if p.Marble != nil && p.Marble.isBlocking() {
+		return fmt.Errorf("Marble %s is blocking position %s for Marble %s", p.Marble, p, m)
+	} else if p.Marble != nil && seven {
+		p.Marble.sendHome()
+	}
+
+	return nil
+}
+
+func (m *Marble) sendHome() {
+	m.Position.Marble = nil
+	home := m.Player.Section.Home
+
+	for _, h := range home {
+		if h.Marble == nil {
+			h.Marble = m
+			m.Position = h
+			return
+		}
+	}
+}
+
+func (m *Marble) canOut() bool {
+	if m.Position.PositionType != Home {
+		return false
+	}
+
+	return m.Position.NextPosition.Marble == nil || !m.Position.NextPosition.Marble.isBlocking()
+}
+
+func (m *Marble) goOut() error {
+	if m.Position.PositionType != Home {
+		return fmt.Errorf("Marble %s was not at home, Marble was on %s", m, m.Position)
+	}
+
+	start := m.Position.NextPosition
+	if start.PositionType != Start {
+		return fmt.Errorf("Next position %s is supposed to be start but is %s instead", start, start.PositionType)
+	}
+
+	if start.Marble != nil && start.Marble.isBlocking() {
+		return fmt.Errorf("Start is blocked by %s", start.Marble)
+	}
+
+	if err := m.Position.moveFrom(m); err != nil {
+		return fmt.Errorf("can't go out %w", err)
+	}
+
+	if err := start.moveTo(m); err != nil {
+		return fmt.Errorf("can't go out %w", err)
+	}
+
+	return nil
+}
+
+func (m *Marble) isBlocking() bool {
+	if m.Position.PositionType == Heaven {
+		return true
+	}
+
+	if m.Position.Section != m.Player.Section {
+		return false
+	}
+
+	return m.StartTouches == 1 && m.Position.PositionType == Start
+}
+
+func (m *Marble) canMove(places int, heaven bool) bool {
+	backwards := places < 0
+	if heaven && backwards {
+		return false
+	}
+
+	next := m.Position
+	startTouches := m.StartTouches
+
+	abs := int(math.Abs(float64(places)))
+	for range abs {
+		if heaven && next.AltNextPosition != nil && next.Section == m.Player.Section {
+			if startTouches < 2 {
+				return false
+			}
+			next = next.AltNextPosition
+		} else if places > 0 {
+			if next.NextPosition == nil {
+				return false // end of heaven
+			}
+
+			next = next.NextPosition
+		} else {
+			next = next.LastPosition
+		}
+
+		if next.Marble != nil && next.Marble.isBlocking() {
+			return false
+		}
+
+		if next.PositionType == Home {
+			startTouches++
+		}
+	}
+
+	return true
+}
+
+func (m *Marble) move(places int, heaven, seven bool) error {
+	backwards := places < 0
+	if backwards && heaven {
+		return fmt.Errorf("can not walk backwards into heaven")
+	}
+
+	next := m.Position
+
+	abs := int(math.Abs(float64(places)))
+	var via []*Position
+	for range abs {
+		if heaven && next.AltNextPosition != nil && next.Section == m.Player.Section {
+			if m.StartTouches < 2 {
+				return fmt.Errorf("can not walk %s into heaven before touching start at least twice", m)
+			}
+			next = next.AltNextPosition
+		} else if places > 0 {
+			if next.NextPosition == nil {
+				return fmt.Errorf("can't walk %s past top of heaven", m)
+			}
+
+			next = next.NextPosition
+		} else {
+			next = next.LastPosition
+		}
+
+		if next.Marble != nil && next.Marble.isBlocking() {
+			return fmt.Errorf("Marble %s is blocked by %s", m, next.Marble)
+		}
+
+		if next.PositionType == Home {
+			m.StartTouches++
+		}
+		via = append(via, next)
+	}
+
+	m.Position.moveFrom(m)
+	for _, v := range via {
+		v.moveVia(m, seven)
+	}
+	next.moveTo(m)
+
+	return nil
+}
