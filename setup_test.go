@@ -33,8 +33,14 @@ func assertNotNil(t *testing.T, value any) {
 }
 
 func Test_createBoard_4(t *testing.T) {
-	gb, err := NewGameBoard(4)
+	gb := NewGameBoard()
 
+	gb.Join("a")
+	gb.Join("b")
+	gb.Join("c")
+	gb.Join("d")
+
+	err := gb.Start()
 	if err != nil {
 		t.Fatalf("failed to create gameboard with error %v", err)
 	}
