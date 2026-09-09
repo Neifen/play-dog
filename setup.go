@@ -11,12 +11,12 @@ type GameBoard struct {
 	turn            int
 	Players         []*Player
 	Sections        []*Section
-	availableColors []Color
+	AvailableColors []Color
 }
 
 func NewGameBoard() *GameBoard {
 	return &GameBoard{
-		availableColors: []Color{Blue, Red, Yellow, Green, White, Black},
+		AvailableColors: []Color{Blue, Red, Yellow, Green, White, Black},
 	}
 }
 
@@ -26,14 +26,30 @@ func (gb *GameBoard) Join(name string) *Player {
 	return player
 }
 
-func (gb *GameBoard) ChooseColor(player *Player, color Color) {
-	gb.availableColors = slices.DeleteFunc(gb.availableColors, func(c Color) bool { return c == color })
+func (gb *GameBoard) ChooseColor(player *Player, color Color) error {
+
+	idx := slices.Index(gb.AvailableColors, color)
+	if idx == -1 {
+		return fmt.Errorf("color %s is already picked", color)
+	}
+
+	gb.AvailableColors = slices.Delete(gb.AvailableColors, idx, idx+1)
 	player.Color = color
+	return nil
 }
 
-func (gb *GameBoard) ChoosePartner(one, two *Player) {
+func (gb *GameBoard) ChoosePartner(one, two *Player) error {
+	if one.Partner != nil {
+		return fmt.Errorf("player %s, already has a partner", one)
+	}
+
+	if two.Partner != nil {
+		return fmt.Errorf("player %s, already has a partner", two)
+	}
+
 	one.Partner = two
 	two.Partner = one
+	return nil
 }
 
 func (gb *GameBoard) Ready() bool {
@@ -54,9 +70,9 @@ func (gb *GameBoard) Start() error {
 
 	for i, player := range gb.Players {
 		if player.Color == "" {
-			randomIndex := rand.IntN(len(gb.availableColors))
-			player.Color = gb.availableColors[randomIndex]
-			gb.availableColors = slices.Delete(gb.availableColors, randomIndex, randomIndex+1)
+			randomIndex := rand.IntN(len(gb.AvailableColors))
+			player.Color = gb.AvailableColors[randomIndex]
+			gb.AvailableColors = slices.Delete(gb.AvailableColors, randomIndex, randomIndex+1)
 		}
 
 		if player.Partner == nil {
@@ -151,7 +167,7 @@ type Player struct {
 }
 
 func (p *Player) String() string {
-	return fmt.Sprintf("%s (+ %s)", p.Color, p.Partner.Color)
+	return fmt.Sprintf("%s - %s + [%s-%s]", p.Name, p.Color, p.Partner.Name, p.Partner.Color)
 }
 
 func NewPlayer(name string) *Player {

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -79,4 +81,50 @@ func Test_createBoard_4(t *testing.T) {
 
 	}
 	assertEq(t, next, start)
+}
+
+func Test_PickColorsAndPartners(t *testing.T) {
+	gb := NewGameBoard()
+
+	a := gb.Join("a")
+	b := gb.Join("b")
+	c := gb.Join("c")
+	d := gb.Join("d")
+
+	assertEq(t, len(gb.AvailableColors), 6)
+	gb.ChooseColor(a, Blue)
+	assertEq(t, len(gb.AvailableColors), 5)
+
+	gb.ChooseColor(c, Black)
+	assertEq(t, len(gb.AvailableColors), 4)
+
+	err := gb.ChooseColor(c, Black)
+	assertNotNil(t, err)
+
+	gb.ChoosePartner(b, d)
+
+	err = gb.ChoosePartner(a, b)
+	assertNotNil(t, err)
+
+	err = gb.Start()
+	if err != nil {
+		t.Fatalf("failed to create gameboard with error %v", err)
+	}
+	fmt.Println(gb.Players)
+	fmt.Println(gb.Sections)
+
+	aIdx := slices.Index(gb.Players, a)
+	bIdx := slices.Index(gb.Players, b)
+	cIdx := slices.Index(gb.Players, c)
+	dIdx := slices.Index(gb.Players, d)
+
+	assertEq(t, gb.Players[aIdx].Color, Blue)
+	assertEq(t, gb.Players[cIdx].Color, Black)
+
+	assertEq(t, gb.Players[bIdx].Partner.Name, "d")
+	assertEq(t, gb.Players[dIdx].Partner.Name, "b")
+
+	assertEq(t, math.Abs(float64(bIdx-dIdx)), 2.0)
+	assertEq(t, math.Abs(float64(aIdx-cIdx)), 2.0)
+
 }
