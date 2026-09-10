@@ -146,15 +146,56 @@ func (m *Marble) canMove(places int, heaven bool) bool {
 	return true
 }
 
-func (m *Marble) move(places int, heaven, seven bool) error {
-	backwards := places < 0
+func (m *Marble) swap(other *Marble) error {
+	if !m.canSwapWith(other) {
+		return fmt.Errorf("can not swap marble %s with marble %s", m, other)
+	}
+	m.Position, other.Position = other.Position, m.Position
+	m.Position.Marble, other.Position.Marble = other.Position.Marble, m.Position.Marble
+	return nil
+}
+
+func (m *Marble) canSwapWith(other *Marble) bool {
+	if m.Player == other.Player {
+		return false
+	}
+
+	return m.canSwap() && other.canSwap()
+}
+
+func (m *Marble) canSwap() bool {
+	if m.Position.PositionType == Home || m.Position.PositionType == Heaven {
+		return false
+	}
+
+	return !m.isBlocking()
+}
+
+func (m *Marble) max(cutoff int) int {
+	if m.Position.PositionType == Home {
+		return 0
+	}
+
+	next := m.Position
+	for i := range cutoff {
+		next = next.NextPosition
+		if next.Marble != nil && next.Marble.isBlocking() {
+			return i - 1
+		}
+	}
+
+	return 0
+}
+
+func (m *Marble) move(steps int, heaven, seven bool) error {
+	backwards := steps < 0
 	if backwards && heaven {
 		return fmt.Errorf("can not walk backwards into heaven")
 	}
 
 	next := m.Position
 
-	abs := int(math.Abs(float64(places)))
+	abs := int(math.Abs(float64(steps)))
 	var via []*Position
 	for range abs {
 		if heaven && next.AltNextPosition != nil && next.Section == m.Player.Section {
@@ -162,7 +203,7 @@ func (m *Marble) move(places int, heaven, seven bool) error {
 				return fmt.Errorf("can not walk %s into heaven before touching start at least twice", m)
 			}
 			next = next.AltNextPosition
-		} else if places > 0 {
+		} else if steps > 0 {
 			if next.NextPosition == nil {
 				return fmt.Errorf("can't walk %s past top of heaven", m)
 			}
