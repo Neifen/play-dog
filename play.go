@@ -93,6 +93,8 @@ func (m *Marble) goOut() error {
 		return fmt.Errorf("can't go out %w", err)
 	}
 
+	m.StartTouches = 1
+
 	return nil
 }
 
@@ -138,7 +140,7 @@ func (m *Marble) canMove(places int, heaven bool) bool {
 			return false
 		}
 
-		if next.PositionType == Home {
+		if next.PositionType == Start {
 			startTouches++
 		}
 	}
@@ -153,6 +155,20 @@ func (m *Marble) swap(other *Marble) error {
 	m.Position, other.Position = other.Position, m.Position
 	m.Position.Marble, other.Position.Marble = other.Position.Marble, m.Position.Marble
 	return nil
+}
+
+// Places a marble in a position, if there is another marble there, returns an error and the marble.
+// If the force flag is set, the marble will be send home, returned and no error is thrown
+func (marble *Marble) place(position *Position, force bool) (*Marble, error) {
+	existing := position.Marble
+	if force && existing != nil {
+		existing.sendHome()
+	} else if existing != nil {
+		return existing, fmt.Errorf("position %s already taken by %s", position, existing)
+	}
+
+	marble.Position, position.Marble = position, marble
+	return existing, nil
 }
 
 func (m *Marble) canSwapWith(other *Marble) bool {
@@ -217,7 +233,7 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 			return fmt.Errorf("Marble %s is blocked by %s", m, next.Marble)
 		}
 
-		if next.PositionType == Home {
+		if next.PositionType == Start && next.Section == m.Player.Section {
 			m.StartTouches++
 		}
 		via = append(via, next)

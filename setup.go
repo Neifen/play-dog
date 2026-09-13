@@ -104,6 +104,11 @@ func (gb *GameBoard) Start() error {
 	return nil
 }
 
+func (gb *GameBoard) NextTurn() {
+	gb.turn++
+	gb.turn = gb.turn % len(gb.Players)
+}
+
 func (gb *GameBoard) orderAndLink() {
 	playerAmount := len(gb.Players)
 	unsortedPlayers := gb.Players
@@ -200,7 +205,7 @@ func NewMarbles(player *Player) Marbles {
 type Marble struct {
 	Player       *Player
 	Position     *Position
-	StartTouches uint8 // 0 - 1- 2 then can go to heaven
+	StartTouches int // 0 - 1- 2 then can go to heaven
 }
 
 func (m *Marble) String() string {

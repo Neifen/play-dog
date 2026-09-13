@@ -3,44 +3,21 @@ package main
 import (
 	"fmt"
 	"math"
-	"reflect"
 	"slices"
 	"testing"
 )
-
-func assertEq(t *testing.T, value, expected any) {
-	if value != expected {
-		t.Errorf("expected %+v but got %+v", expected, value)
-	}
-}
-
-func assertNeq(t *testing.T, value, expected any) {
-	if value == expected {
-		t.Errorf("expected %+v to be different from %+v", expected, value)
-	}
-}
-
-func assertNil(t *testing.T, value any) {
-	v := reflect.ValueOf(value)
-	if !v.IsNil() {
-		t.Errorf("expected %+v to be nil", value)
-	}
-}
-
-func assertNotNil(t *testing.T, value any) {
-	v := reflect.ValueOf(value)
-	if v.IsNil() {
-		t.Errorf("expected value to be not be nil")
-	}
-}
 
 func Test_createBoard_4(t *testing.T) {
 	gb := NewGameBoard()
 
 	gb.Join("a")
+	assertEq(t, gb.Ready(), false)
 	gb.Join("b")
+	assertEq(t, gb.Ready(), false)
 	gb.Join("c")
+	assertEq(t, gb.Ready(), false)
 	gb.Join("d")
+	assertEq(t, gb.Ready(), true)
 
 	err := gb.Start()
 	if err != nil {
@@ -66,10 +43,10 @@ func Test_createBoard_4(t *testing.T) {
 	next := start
 	for i := range 64 {
 		if (i-9)%16 == 0 {
-			assertNotNil(t, next.AltNextPosition)
+			assertNotNil(t, next.AltNextPosition, "next alt next Position")
 			assertEq(t, next.AltNextPosition.PositionType, Heaven)
 		} else {
-			assertNil(t, next.AltNextPosition)
+			assertNil(t, next.AltNextPosition, "next alt next Position")
 		}
 		next = next.NextPosition
 	}
@@ -99,12 +76,12 @@ func Test_PickColorsAndPartners(t *testing.T) {
 	assertEq(t, len(gb.AvailableColors), 4)
 
 	err := gb.ChooseColor(c, Black)
-	assertNotNil(t, err)
+	assertNotNil(t, err, "err chooseColor c:Black")
 
 	gb.ChoosePartner(b, d)
 
 	err = gb.ChoosePartner(a, b)
-	assertNotNil(t, err)
+	assertNotNil(t, err, "err choosePartner a,b")
 
 	err = gb.Start()
 	if err != nil {
