@@ -113,6 +113,7 @@ func (a splitAction) ApplyMove(chosen Move) error {
 		return fmt.Errorf("splitAction needs to use a moveSplit")
 	}
 	a.stepsLeft -= moveSeven.chosenSteps
+	fmt.Println(moveSeven.chosenSteps, " ", moveSeven.marble, " @", moveSeven.marble.Position)
 	return chosen.act()
 }
 
@@ -137,7 +138,7 @@ func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 	for i := range a.stepsLeft {
 		steps := i + 1
 		canMoveHeaven := m.canMove(steps, true)
-		canMove := m.canMove(steps, true)
+		canMove := m.canMove(steps, false)
 		if !canMove && !canMoveHeaven {
 			continue // no need to figure out `canFill` -> expensive
 		}
@@ -145,10 +146,12 @@ func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 		left := a.stepsLeft - steps
 		canFill := maxMoves(m.Player.Marbles, m, left) >= left
 		if canFill && canMoveHeaven {
+			fmt.Println("heaven: can move and can fill:", m, " chosen steps:", steps)
 			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: true})
 		}
 
 		if canFill && canMove {
+			fmt.Println("can move and can fill:", m, " chosen steps:", steps)
 			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: false})
 		}
 	}

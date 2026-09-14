@@ -205,6 +205,7 @@ func (m *Marble) max(cutoff int) int {
 
 	next := m.Position
 	for i := range cutoff {
+		// no need to check Heaven: position 1,2,3,4 are never blocking. So it comes to the same result
 		next = next.NextPosition
 		if next.Marble != nil && next.Marble.isBlocking() {
 			return i - 1
@@ -263,6 +264,7 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 
 	m.Position.moveFrom(m)
 	for _, v := range via {
+		// fmt.Println("via", v)
 		v.moveVia(m, seven)
 	}
 	next.moveTo(m)
