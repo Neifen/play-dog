@@ -169,6 +169,8 @@ func (_ moveAction) LegalMoves(_ *GameBoard, m *Marble, card Card) []Move {
 	if card.leaveHome && m.canOut() {
 		moves = append(moves, LeaveHome{marble: m})
 		return moves // cannot move more with this
+	} else if m.Position.PositionType == Home && !card.leaveHome {
+		return moves // can't leave home without a leavehome card
 	}
 
 	for _, places := range card.Moves {
