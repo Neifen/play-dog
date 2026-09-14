@@ -636,3 +636,42 @@ func Test_FourForward(t *testing.T) {
 	assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 4]", fourthColor), "position fourthStart")
 }
+
+func Test_Seven(t *testing.T) {
+	card := Seven
+
+	gb := setupGame(t)
+	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
+	firstColor := firstAfter.Player.Color
+	secondColor := secondBefore.Player.Color
+	thirdColor := thirdHeaven.Player.Color
+	fourthColor := fourthStart.Player.Color
+	_ = firstColor
+
+	assertEqMsg(t, firstAfter.Position.String(), fmt.Sprintf("%s[REGULAR -8]", secondColor), "position firstAfter")
+	assertEqMsg(t, secondBefore.Position.String(), fmt.Sprintf("%s[REGULAR -4]", secondColor), "position secondBefore")
+	assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
+	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[START 0]", fourthColor), "position fourthStart")
+
+	firstMoves := card.LegalMoves(gb, firstAfter)
+	assertEqMsg(t, len(firstMoves), 7, "len firstMoves")
+	// assertNoErr(t, card.ApplyMove(firstMoves[1]), "apply Blue move")
+
+	// second got eaten
+	secondMoves := card.LegalMoves(gb, secondBefore)
+	assertEqMsg(t, len(secondMoves), 3, "len secondMoves")
+	// assertNoErr(t, card.ApplyMove(secondMoves[1]), "apply Blue move")
+
+	thirdMoves := card.LegalMoves(gb, thirdHeaven)
+	assertEqMsg(t, len(thirdMoves), 7, "len thirdMoves")
+	// assertNoErr(t, card.ApplyMove(thirdMoves[0]), "apply Blue move")
+
+	fourthMoves := card.LegalMoves(gb, fourthStart)
+	assertEqMsg(t, len(fourthMoves), 7, "len fourthMoves")
+	// assertNoErr(t, card.ApplyMove(fourthMoves[1]), "apply Blue move")
+
+	assertEqMsg(t, firstAfter.Position.String(), fmt.Sprintf("%s[REGULAR -4]", secondColor), "position firstAfter")
+	assertEqMsg(t, secondBefore.Position.String(), fmt.Sprintf("%s[HOME 0]", secondColor), "position secondBefore")
+	assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
+	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 4]", fourthColor), "position fourthStart")
+}
