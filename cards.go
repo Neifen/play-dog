@@ -48,16 +48,9 @@ func (l LeaveHome) act() error {
 }
 
 type CardAction interface {
-	LegalMoves(gb *GameBoard, p *Player, m *Marble, c *Card) []Move
+	LegalMoves(gb *GameBoard, m *Marble, c Card) []Move
 	ApplyMove(chosen Move) error //todo: not sure this is needed
 }
-
-// var actions = map[CardType]CardAction{
-// 	TypeMover:    moveAction{},
-// 	TypeSplitter: splitAction{stepsLeft: 7},
-// 	TypeJoker:    jokerAction{finishingAllowed: true},
-// 	TypeSwap:     swapAction{},
-// }
 
 type jokerAction struct {
 	finishingAllowed bool
@@ -71,12 +64,12 @@ func (a jokerAction) ApplyMove(chosen Move) error {
 }
 
 // LegalMoves implements [CardAction].
-func (a jokerAction) LegalMoves(gb *GameBoard, p *Player, m *Marble, c *Card) []Move {
+func (a jokerAction) LegalMoves(gb *GameBoard, m *Marble, c Card) []Move {
 	if !a.picked || a.cardPicked.Name == c.Name {
 		return []Move{}
 	}
 
-	return a.cardPicked.Action.LegalMoves(gb, p, m, c)
+	return a.cardPicked.LegalMoves(gb, m)
 }
 
 type swapAction struct {
@@ -88,14 +81,14 @@ func (_ swapAction) ApplyMove(chosen Move) error {
 }
 
 // LegalMoves implements [CardAction].
-func (_ swapAction) LegalMoves(gb *GameBoard, p *Player, m *Marble, c *Card) []Move {
+func (_ swapAction) LegalMoves(gb *GameBoard, m *Marble, c Card) []Move {
 	var moves []Move
 	if !m.canSwap() {
 		return moves
 	}
 
 	for _, otherPlayer := range gb.Players {
-		if p == otherPlayer {
+		if m.Player == otherPlayer {
 			continue
 		}
 
@@ -139,7 +132,7 @@ func maxMoves(marbles Marbles, except *Marble, cutoff int) int {
 }
 
 // LegalMoves implements [CardAction].
-func (a splitAction) LegalMoves(_ *GameBoard, p *Player, m *Marble, c *Card) []Move {
+func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 	var moves []Move
 	for i := range a.stepsLeft {
 		steps := i + 1
@@ -150,7 +143,7 @@ func (a splitAction) LegalMoves(_ *GameBoard, p *Player, m *Marble, c *Card) []M
 		}
 
 		left := a.stepsLeft - steps
-		canFill := maxMoves(p.Marbles, m, left) >= left
+		canFill := maxMoves(m.Player.Marbles, m, left) >= left
 		if canFill && canMoveHeaven {
 			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: true})
 		}
@@ -171,7 +164,7 @@ func (_ moveAction) ApplyMove(chosen Move) error {
 }
 
 // LegalMoves implements [CardAction].
-func (_ moveAction) LegalMoves(_ *GameBoard, p *Player, m *Marble, card *Card) []Move {
+func (_ moveAction) LegalMoves(_ *GameBoard, m *Marble, card Card) []Move {
 	var moves []Move
 	if card.leaveHome && m.canOut() {
 		moves = append(moves, LeaveHome{marble: m})
@@ -195,6 +188,14 @@ type Card struct {
 	Moves     []int
 	Action    CardAction
 	leaveHome bool
+}
+
+func (c Card) LegalMoves(gb *GameBoard, m *Marble) []Move {
+	return c.Action.LegalMoves(gb, m, c)
+}
+
+func (c Card) ApplyMove(move Move) error {
+	return c.Action.ApplyMove(move)
 }
 
 var (

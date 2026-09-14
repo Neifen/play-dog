@@ -12,6 +12,12 @@ func assertEq(t *testing.T, value, expected any) {
 	}
 }
 
+func assertEqMsg(t *testing.T, value, expected any, msg string, a ...any) {
+	if value != expected {
+		t.Errorf("expected '%+v' for %s but got '%+v'", expected, fmt.Sprintf(msg, a...), value)
+	}
+}
+
 func assertNeq(t *testing.T, value, expected any) {
 	if value == expected {
 		t.Errorf("expected %+v to be different from %+v", expected, value)
@@ -35,6 +41,17 @@ func assertNotNil(t *testing.T, value any, desc string, a ...any) {
 	v := reflect.ValueOf(value)
 	if v.IsNil() {
 		t.Errorf("expected value for %s to be not be nil", fmt.Sprintf(desc, a...))
+	}
+}
+
+func assertErr(t *testing.T, err error, desc string, a ...any) {
+	if err == nil {
+		t.Errorf("expected error for %s but there wasn't any", fmt.Sprintf(desc, a...))
+	}
+}
+func assertNoErr(t *testing.T, err error, desc string, a ...any) {
+	if err != nil {
+		t.Errorf("expected no error for %s but was %v", fmt.Sprintf(desc, a...), err)
 	}
 }
 

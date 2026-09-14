@@ -63,10 +63,26 @@ func Test_createBoard_4(t *testing.T) {
 func Test_PickColorsAndPartners(t *testing.T) {
 	gb := NewGameBoard()
 
-	a := gb.Join("a")
-	b := gb.Join("b")
-	c := gb.Join("c")
-	d := gb.Join("d")
+	a, err := gb.Join("a")
+	if err != nil {
+		fmt.Println(err)
+	}
+	b, err := gb.Join("b")
+	if err != nil {
+		fmt.Println(err)
+	}
+	c, err := gb.Join("c")
+	if err != nil {
+		fmt.Println(err)
+	}
+	d, err := gb.Join("d")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	bAgain, err := gb.Join("b")
+	assertNotNil(t, err, "test join b again")
+	assertNil(t, bAgain, "test join b again")
 
 	assertEq(t, len(gb.AvailableColors), 6)
 	gb.ChooseColor(a, Blue)
@@ -75,7 +91,7 @@ func Test_PickColorsAndPartners(t *testing.T) {
 	gb.ChooseColor(c, Black)
 	assertEq(t, len(gb.AvailableColors), 4)
 
-	err := gb.ChooseColor(c, Black)
+	err = gb.ChooseColor(c, Black)
 	assertNotNil(t, err, "err chooseColor c:Black")
 
 	gb.ChoosePartner(b, d)

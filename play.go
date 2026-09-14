@@ -145,6 +145,13 @@ func (m *Marble) canMove(places int, heaven bool) bool {
 		}
 	}
 
+	// needed in order to get right amount of moves in cards.go
+	if heaven && next.PositionType != Heaven {
+		return false
+	} else if !heaven && next.PositionType == Heaven {
+		return false
+	}
+
 	return true
 }
 
@@ -210,12 +217,13 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 	}
 
 	next := m.Position
+	startTouches := m.StartTouches
 
 	abs := int(math.Abs(float64(steps)))
 	var via []*Position
 	for range abs {
 		if heaven && next.AltNextPosition != nil && next.Section == m.Player.Section {
-			if m.StartTouches < 2 {
+			if startTouches < 2 {
 				return fmt.Errorf("can not walk %s into heaven before touching start at least twice", m)
 			}
 			next = next.AltNextPosition
@@ -234,9 +242,15 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 		}
 
 		if next.PositionType == Start && next.Section == m.Player.Section {
-			m.StartTouches++
+			startTouches++
 		}
 		via = append(via, next)
+	}
+
+	if heaven && next.PositionType != Heaven {
+		return fmt.Errorf("Heaven flag was set but Marble %s did not land in heaven but is %s", next.Marble, next)
+	} else if !heaven && next.PositionType == Heaven {
+		return fmt.Errorf("Heaven flag was not set but Marble %s is in heaven at %s", next.Marble, next)
 	}
 
 	m.Position.moveFrom(m)
@@ -244,6 +258,7 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 		v.moveVia(m, seven)
 	}
 	next.moveTo(m)
+	m.StartTouches = startTouches
 
 	return nil
 }

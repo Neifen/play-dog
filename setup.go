@@ -8,22 +8,28 @@ import (
 )
 
 type GameBoard struct {
-	turn            int
 	Players         []*Player
 	Sections        []*Section
 	AvailableColors []Color
+
+	playersByName map[string]*Player
 }
 
 func NewGameBoard() *GameBoard {
 	return &GameBoard{
+		playersByName:   make(map[string]*Player),
 		AvailableColors: []Color{Blue, Red, Yellow, Green, White, Black},
 	}
 }
 
-func (gb *GameBoard) Join(name string) *Player {
+func (gb *GameBoard) Join(name string) (*Player, error) {
 	player := NewPlayer(name)
+	if _, exists := gb.playersByName[name]; exists {
+		return nil, fmt.Errorf("player with name %s already exists", name)
+	}
 	gb.Players = append(gb.Players, player)
-	return player
+	gb.playersByName[name] = player
+	return player, nil
 }
 
 func (gb *GameBoard) ChooseColor(player *Player, color Color) error {
@@ -100,13 +106,7 @@ func (gb *GameBoard) Start() error {
 	}
 
 	gb.orderAndLink()
-	gb.turn = 0
 	return nil
-}
-
-func (gb *GameBoard) NextTurn() {
-	gb.turn++
-	gb.turn = gb.turn % len(gb.Players)
 }
 
 func (gb *GameBoard) orderAndLink() {
@@ -324,9 +324,17 @@ func linkPositions(prev, after *Position) {
 }
 
 func NewPosition(section *Section, posType PositionType, index int) *Position {
+	if posType == Regular {
+		// 0 is start for ID
+		index -= 9
+		if index == 0 {
+			posType = Start
+		}
+	}
+
 	return &Position{
 		PositionType: posType,
 		Section:      section,
-		ID:           fmt.Sprintf("%s[%s-%d]", section.Color, posType, index),
+		ID:           fmt.Sprintf("%s[%s %d]", section.Color, posType, index),
 	}
 }
