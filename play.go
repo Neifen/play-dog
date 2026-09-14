@@ -112,12 +112,16 @@ func (m *Marble) isBlocking() bool {
 
 func (m *Marble) canMove(places int, heaven bool) bool {
 	backwards := places < 0
-	if heaven && backwards {
-		return false
+	if backwards && heaven {
+		return false // can walk back into heaven
 	}
 
 	next := m.Position
 	startTouches := m.StartTouches
+
+	if backwards && !next.onBoard() {
+		return false // can walk back when not on the board
+	}
 
 	abs := int(math.Abs(float64(places)))
 	for range abs {
@@ -218,6 +222,10 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 
 	next := m.Position
 	startTouches := m.StartTouches
+
+	if backwards && !next.onBoard() {
+		return fmt.Errorf("can not walk backwards when in heaven")
+	}
 
 	abs := int(math.Abs(float64(steps)))
 	var via []*Position

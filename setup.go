@@ -318,6 +318,10 @@ func (p *Position) String() string {
 	return fmt.Sprintf("%s", p.ID)
 }
 
+func (p *Position) onBoard() bool {
+	return p.PositionType == Regular || p.PositionType == Start || p.PositionType == Center
+}
+
 func linkPositions(prev, after *Position) {
 	prev.NextPosition = after
 	after.LastPosition = prev
