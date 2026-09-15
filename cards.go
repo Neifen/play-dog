@@ -60,12 +60,15 @@ type jokerAction struct {
 
 // ApplyMove implements [CardAction].
 func (a jokerAction) ApplyMove(chosen Move) error {
+	if !a.picked || a.cardPicked.Name == Joker.Name {
+		return fmt.Errorf("no card picked")
+	}
 	return a.cardPicked.Action.ApplyMove(chosen)
 }
 
 // LegalMoves implements [CardAction].
 func (a jokerAction) LegalMoves(gb *GameBoard, m *Marble, c Card) []Move {
-	if !a.picked || a.cardPicked.Name == c.Name {
+	if !a.picked || a.cardPicked.Name == Joker.Name {
 		return []Move{}
 	}
 
@@ -113,7 +116,6 @@ func (a splitAction) ApplyMove(chosen Move) error {
 		return fmt.Errorf("splitAction needs to use a moveSplit")
 	}
 	a.stepsLeft -= moveSeven.chosenSteps
-	fmt.Println(moveSeven.chosenSteps, " ", moveSeven.marble, " @", moveSeven.marble.Position)
 	return chosen.act()
 }
 
@@ -135,6 +137,10 @@ func maxMoves(marbles Marbles, except *Marble, cutoff int) int {
 // LegalMoves implements [CardAction].
 func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 	var moves []Move
+	if m.Position.PositionType == Home && !c.leaveHome {
+		return moves // can't leave home without a leavehome card
+	}
+
 	for i := range a.stepsLeft {
 		steps := i + 1
 		canMoveHeaven := m.canMove(steps, true)
@@ -146,12 +152,10 @@ func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 		left := a.stepsLeft - steps
 		canFill := maxMoves(m.Player.Marbles, m, left) >= left
 		if canFill && canMoveHeaven {
-			fmt.Println("heaven: can move and can fill:", m, " chosen steps:", steps)
 			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: true})
 		}
 
 		if canFill && canMove {
-			fmt.Println("can move and can fill:", m, " chosen steps:", steps)
 			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: false})
 		}
 	}
@@ -201,6 +205,18 @@ func (c Card) LegalMoves(gb *GameBoard, m *Marble) []Move {
 
 func (c Card) ApplyMove(move Move) error {
 	return c.Action.ApplyMove(move)
+}
+
+func (c Card) JockerPickCard(picked Card) Card {
+	jokerAction, ok := c.Action.(jokerAction)
+	if !ok {
+		return c
+	}
+	jokerAction.picked = true
+	jokerAction.cardPicked = picked
+	c.Action = jokerAction
+
+	return c
 }
 
 var (

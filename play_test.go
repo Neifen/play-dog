@@ -417,3 +417,31 @@ func Test_swap(t *testing.T) {
 	assertEq(t, otherAPlayer.Section.Home[0].NextPosition.NextPosition.Marble, otherA)
 	assertEq(t, otherBPlayer.Section.Home[0].NextPosition.NextPosition.Marble, otherB)
 }
+
+func Test_max(t *testing.T) {
+	gb := setupGame(t)
+
+	marble1 := gb.Players[0].Marbles[3]
+	marble2 := gb.Players[1].Marbles[3]
+
+	if err := marble1.goOut(); err != nil {
+		fmt.Println(err)
+	}
+
+	if err := marble1.move(12, false, false); err != nil {
+		fmt.Println(err)
+	}
+
+	if err := marble2.goOut(); err != nil {
+		fmt.Println(err)
+	}
+
+	assertEq(t, marble1.max(1), 1)
+	assertEq(t, marble1.max(2), 2)
+	assertEq(t, marble1.max(3), 3)
+	assertEq(t, marble1.max(4), 3)
+	assertEq(t, marble1.max(5), 3)
+	assertEq(t, marble1.max(6), 3)
+
+	assertEq(t, marble2.max(6), 6)
+}

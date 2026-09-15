@@ -208,11 +208,11 @@ func (m *Marble) max(cutoff int) int {
 		// no need to check Heaven: position 1,2,3,4 are never blocking. So it comes to the same result
 		next = next.NextPosition
 		if next.Marble != nil && next.Marble.isBlocking() {
-			return i - 1
+			return i
 		}
 	}
 
-	return 0
+	return cutoff
 }
 
 func (m *Marble) move(steps int, heaven, seven bool) error {
@@ -259,12 +259,11 @@ func (m *Marble) move(steps int, heaven, seven bool) error {
 	if heaven && next.PositionType != Heaven {
 		return fmt.Errorf("Heaven flag was set but Marble %s did not land in heaven but is %s", next.Marble, next)
 	} else if !heaven && next.PositionType == Heaven {
-		return fmt.Errorf("Heaven flag was not set but Marble %s is in heaven at %s", next.Marble, next)
+		return fmt.Errorf("Heaven flag was not set but Marble %s is in heaven at %s", next.Marble, m.Position)
 	}
 
 	m.Position.moveFrom(m)
 	for _, v := range via {
-		// fmt.Println("via", v)
 		v.moveVia(m, seven)
 	}
 	next.moveTo(m)

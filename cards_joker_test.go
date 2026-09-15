@@ -6,46 +6,7 @@ import (
 	"testing"
 )
 
-// First Marble is 8 in front, Second is 4 behind, Third is in heaven, Fourth is locking start
-func setupMarbles(gb *GameBoard) (*Marble, *Marble, *Marble, *Marble) {
-	// can't use names for this as order is random
-	first := gb.Players[0]
-	second := gb.Players[1]
-	third := gb.Players[2]
-	fourth := gb.Players[3]
-
-	if err := first.Marbles[0].goOut(); err != nil {
-		fmt.Println(err)
-	}
-	if err := first.Marbles[0].move(8, false, false); err != nil {
-		fmt.Println(err)
-	}
-
-	if err := second.Marbles[0].goOut(); err != nil {
-		fmt.Println(err)
-	}
-	if err := second.Marbles[0].move(-4, false, false); err != nil {
-		fmt.Println(err)
-	}
-
-	if err := third.Marbles[0].goOut(); err != nil {
-		fmt.Println(err)
-	}
-	if err := third.Marbles[0].move(-4, false, false); err != nil {
-		fmt.Println(err)
-	}
-	if err := third.Marbles[0].move(5, true, false); err != nil {
-		fmt.Println(err)
-	}
-
-	if err := fourth.Marbles[0].goOut(); err != nil {
-		fmt.Println(err)
-	}
-
-	return first.Marbles[0], second.Marbles[0], third.Marbles[0], fourth.Marbles[0]
-}
-
-func Test_Two(t *testing.T) {
+func Test_Two_Joker(t *testing.T) {
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
@@ -54,7 +15,9 @@ func Test_Two(t *testing.T) {
 	fourthColor := fourthStart.Player.Color
 	_ = firstColor
 
-	card := Two
+	card := Joker
+	card = card.JockerPickCard(Two)
+
 	firstMoves := card.LegalMoves(gb, firstAfter)
 	secondMoves := card.LegalMoves(gb, secondBefore)
 	thirdMoves := card.LegalMoves(gb, thirdHeaven)
@@ -81,7 +44,7 @@ func Test_Two(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 2]", fourthColor), "position fourthStart")
 }
 
-func Test_Three(t *testing.T) {
+func Test_Three_Joker(t *testing.T) {
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
@@ -90,7 +53,9 @@ func Test_Three(t *testing.T) {
 	fourthColor := fourthStart.Player.Color
 	_ = firstColor
 
-	card := Three
+	card := Joker
+	card = card.JockerPickCard(Three)
+
 	firstMoves := card.LegalMoves(gb, firstAfter)
 	secondMoves := card.LegalMoves(gb, secondBefore)
 	thirdMoves := card.LegalMoves(gb, thirdHeaven)
@@ -117,7 +82,7 @@ func Test_Three(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 3]", fourthColor), "position fourthStart")
 }
 
-func Test_FiveA(t *testing.T) {
+func Test_FiveA_Joker(t *testing.T) {
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
@@ -126,7 +91,8 @@ func Test_FiveA(t *testing.T) {
 	fourthColor := fourthStart.Player.Color
 	_ = firstColor
 
-	card := Five
+	card := Joker
+	card = card.JockerPickCard(Five)
 	firstMoves := card.LegalMoves(gb, firstAfter)
 	secondMoves := card.LegalMoves(gb, secondBefore)
 	thirdMoves := card.LegalMoves(gb, thirdHeaven)
@@ -153,7 +119,7 @@ func Test_FiveA(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 5]", fourthColor), "position fourthStart")
 }
 
-func Test_FiveB(t *testing.T) {
+func Test_FiveB_Joker(t *testing.T) {
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
@@ -162,7 +128,9 @@ func Test_FiveB(t *testing.T) {
 	fourthColor := fourthStart.Player.Color
 	_ = firstColor
 
-	card := Five
+	card := Joker
+	card = card.JockerPickCard(Five)
+
 	firstMoves := card.LegalMoves(gb, firstAfter)
 	secondMoves := card.LegalMoves(gb, secondBefore)
 	thirdMoves := card.LegalMoves(gb, thirdHeaven)
@@ -189,8 +157,9 @@ func Test_FiveB(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 5]", fourthColor), "position fourthStart")
 }
 
-func Test_SixA(t *testing.T) {
-	card := Six
+func Test_SixA_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Six)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -227,8 +196,9 @@ func Test_SixA(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 6]", fourthColor), "position fourthStart")
 }
 
-func Test_SixB(t *testing.T) {
-	card := Six
+func Test_SixB_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Six)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -265,8 +235,9 @@ func Test_SixB(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 6]", fourthColor), "position fourthStart")
 }
 
-func Test_EightA(t *testing.T) {
-	card := Eight
+func Test_EightA_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Eight)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -302,8 +273,9 @@ func Test_EightA(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -8]", firstColor), "position fourthStart")
 }
 
-func Test_EightB(t *testing.T) {
-	card := Eight
+func Test_EightB_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Eight)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -339,8 +311,9 @@ func Test_EightB(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -8]", firstColor), "position fourthStart")
 }
 
-func Test_Nine(t *testing.T) {
-	card := Nine
+func Test_Nine_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Nine)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -376,8 +349,9 @@ func Test_Nine(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -7]", firstColor), "position fourthStart")
 }
 
-func Test_Ten(t *testing.T) {
-	card := Ten
+func Test_Ten_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Ten)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -413,8 +387,9 @@ func Test_Ten(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -6]", firstColor), "position fourthStart")
 }
 
-func Test_Queen(t *testing.T) { //12
-	card := Queen
+func Test_Queen_Joker(t *testing.T) { //12
+	card := Joker
+	card = card.JockerPickCard(Queen)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -450,8 +425,9 @@ func Test_Queen(t *testing.T) { //12
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -4]", firstColor), "position fourthStart")
 }
 
-func Test_King(t *testing.T) { //12
-	card := King
+func Test_King_Joker(t *testing.T) { //13
+	card := Joker
+	card = card.JockerPickCard(King)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -487,8 +463,9 @@ func Test_King(t *testing.T) { //12
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -3]", firstColor), "position fourthStart")
 }
 
-func Test_AceOne(t *testing.T) {
-	card := Ace
+func Test_AceOne_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Ace)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -525,8 +502,9 @@ func Test_AceOne(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 1]", fourthColor), "position fourthStart")
 }
 
-func Test_AceEleven(t *testing.T) {
-	card := Ace
+func Test_AceEleven_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Ace)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -562,8 +540,9 @@ func Test_AceEleven(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -5]", firstColor), "position fourthStart")
 }
 
-func Test_FourBack(t *testing.T) {
-	card := Four
+func Test_FourBack_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Four)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -599,8 +578,9 @@ func Test_FourBack(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -4]", fourthColor), "position fourthStart")
 }
 
-func Test_FourForward(t *testing.T) {
-	card := Four
+func Test_FourForward_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Four)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -638,8 +618,9 @@ func Test_FourForward(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR 4]", fourthColor), "position fourthStart")
 }
 
-func Test_Seven(t *testing.T) {
-	card := Seven
+func Test_Seven_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Seven)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -687,8 +668,9 @@ func Test_Seven(t *testing.T) {
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[REGULAR -9]", firstColor), "position fourthStart")
 }
 
-func Test_Jack(t *testing.T) {
-	card := Jack
+func Test_Jack_Joker(t *testing.T) {
+	card := Joker
+	card = card.JockerPickCard(Jack)
 
 	gb := setupGame(t)
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
@@ -735,73 +717,4 @@ func Test_Jack(t *testing.T) {
 	assertEqMsg(t, secondBefore.Position.String(), fmt.Sprintf("%s[REGULAR -4]", secondColor), "position secondBefore")
 	assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
 	assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[START 0]", fourthColor), "position fourthStart")
-}
-
-func Test_GoOut(t *testing.T) {
-
-	cards := []Card{Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Ace, Queen, King, Jack}
-
-	for _, card := range cards {
-		gb := setupGame(t)
-		firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
-		firstColor := firstAfter.Player.Color
-		secondColor := secondBefore.Player.Color
-		thirdColor := thirdHeaven.Player.Color
-		fourthColor := fourthStart.Player.Color
-		_ = firstColor
-
-		assertEqMsg(t, firstAfter.Position.String(), fmt.Sprintf("%s[REGULAR -8]", secondColor), "position firstAfter")
-		assertEqMsg(t, secondBefore.Position.String(), fmt.Sprintf("%s[REGULAR -4]", secondColor), "position secondBefore")
-		assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
-		assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[START 0]", fourthColor), "position fourthStart")
-
-		for i := range 3 {
-			if i == 0 {
-				continue // don't test first marble
-			}
-			result := 0
-			if card.leaveHome {
-				result = 1
-			}
-
-			// first player
-			firstPMarble := gb.Players[0].Marbles[i]
-			firstMoves := card.LegalMoves(gb, firstPMarble)
-			assertEqMsg(t, len(firstMoves), result, "len firstMoves")
-			if i == 3 {
-				assertNoErr(t, card.ApplyMove(firstMoves[0]), "apply First player move")
-				assertEqMsg(t, firstPMarble.Position.String(), fmt.Sprintf("%s[START 0]", firstColor), "position firstPMarble")
-			}
-
-			// second player
-			secondPMarble := gb.Players[1].Marbles[i]
-			secondMoves := card.LegalMoves(gb, secondPMarble)
-			assertEqMsg(t, len(secondMoves), result, "len secondMoves")
-			if i == 3 {
-				assertNoErr(t, card.ApplyMove(secondMoves[0]), "apply Second player move")
-				assertEqMsg(t, secondPMarble.Position.String(), fmt.Sprintf("%s[START 0]", secondColor), "position secondPMarble")
-			}
-
-			thirdPMarble := gb.Players[2].Marbles[i]
-			thirdMoves := card.LegalMoves(gb, thirdPMarble)
-			assertEqMsg(t, len(thirdMoves), result, "len thirdMoves")
-			if i == 3 {
-				assertNoErr(t, card.ApplyMove(thirdMoves[0]), "apply Third player move")
-				assertEqMsg(t, thirdPMarble.Position.String(), fmt.Sprintf("%s[START 0]", thirdColor), "position thirdPMarble")
-			}
-
-			// fourth player is blocked
-			fourthPMarble := gb.Players[3].Marbles[i]
-			fourthMoves := card.LegalMoves(gb, fourthPMarble)
-			assertEqMsg(t, len(fourthMoves), 0, "len fourthMoves")
-
-			if i == 3 {
-				assertEqMsg(t, firstAfter.Position.String(), fmt.Sprintf("%s[REGULAR -8]", secondColor), "position firstAfter")
-				assertEqMsg(t, secondBefore.Position.String(), fmt.Sprintf("%s[REGULAR -4]", secondColor), "position secondBefore")
-				assertEqMsg(t, thirdHeaven.Position.String(), fmt.Sprintf("%s[HEAVEN 0]", thirdColor), "position thirdHeaven")
-				assertEqMsg(t, fourthStart.Position.String(), fmt.Sprintf("%s[START 0]", fourthColor), "position fourthStart")
-			}
-		}
-
-	}
 }
