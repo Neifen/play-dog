@@ -46,7 +46,7 @@ func setupMarbles(gb *GameBoard) (*Marble, *Marble, *Marble, *Marble) {
 }
 
 func Test_Two(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -82,7 +82,7 @@ func Test_Two(t *testing.T) {
 }
 
 func Test_Three(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -118,7 +118,7 @@ func Test_Three(t *testing.T) {
 }
 
 func Test_FiveA(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -154,7 +154,7 @@ func Test_FiveA(t *testing.T) {
 }
 
 func Test_FiveB(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -192,7 +192,7 @@ func Test_FiveB(t *testing.T) {
 func Test_SixA(t *testing.T) {
 	card := Six
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -230,7 +230,7 @@ func Test_SixA(t *testing.T) {
 func Test_SixB(t *testing.T) {
 	card := Six
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -268,7 +268,7 @@ func Test_SixB(t *testing.T) {
 func Test_EightA(t *testing.T) {
 	card := Eight
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -305,7 +305,7 @@ func Test_EightA(t *testing.T) {
 func Test_EightB(t *testing.T) {
 	card := Eight
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -342,7 +342,7 @@ func Test_EightB(t *testing.T) {
 func Test_Nine(t *testing.T) {
 	card := Nine
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -379,7 +379,7 @@ func Test_Nine(t *testing.T) {
 func Test_Ten(t *testing.T) {
 	card := Ten
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -416,7 +416,7 @@ func Test_Ten(t *testing.T) {
 func Test_Queen(t *testing.T) { //12
 	card := Queen
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -453,7 +453,7 @@ func Test_Queen(t *testing.T) { //12
 func Test_King(t *testing.T) { //12
 	card := King
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -490,7 +490,7 @@ func Test_King(t *testing.T) { //12
 func Test_AceOne(t *testing.T) {
 	card := Ace
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -528,7 +528,7 @@ func Test_AceOne(t *testing.T) {
 func Test_AceEleven(t *testing.T) {
 	card := Ace
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -565,7 +565,7 @@ func Test_AceEleven(t *testing.T) {
 func Test_FourBack(t *testing.T) {
 	card := Four
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -602,7 +602,7 @@ func Test_FourBack(t *testing.T) {
 func Test_FourForward(t *testing.T) {
 	card := Four
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -641,7 +641,7 @@ func Test_FourForward(t *testing.T) {
 func Test_Seven(t *testing.T) {
 	card := Seven
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -690,7 +690,7 @@ func Test_Seven(t *testing.T) {
 func Test_Jack(t *testing.T) {
 	card := Jack
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -742,7 +742,7 @@ func Test_GoOut(t *testing.T) {
 	cards := []Card{Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Ace, Queen, King, Jack}
 
 	for _, card := range cards {
-		gb := setupGame(t)
+		gb := setupGame()
 		firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 		firstColor := firstAfter.Player.Color
 		secondColor := secondBefore.Player.Color

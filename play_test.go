@@ -3,41 +3,47 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
-func setupGame(t *testing.T) *GameBoard {
-	gb := NewGameBoard()
-	a, err := gb.Join("a")
-	if err != nil {
-		fmt.Println(err)
+func setupGame() *GameBoard {
+	aID := uuid.New()
+	bID := uuid.New()
+	cID := uuid.New()
+	dID := uuid.New()
+
+	a := &GamePlayer{
+		id:      aID,
+		partner: cID,
+		name:    "a",
+		color:   Blue,
 	}
-	b, err := gb.Join("b")
-	if err != nil {
-		fmt.Println(err)
+	b := &GamePlayer{
+		id:      bID,
+		partner: dID,
+		name:    "b",
+		color:   Green,
 	}
-	c, err := gb.Join("c")
-	if err != nil {
-		fmt.Println(err)
+	c := &GamePlayer{
+		id:      cID,
+		partner: aID,
+		name:    "c",
+		color:   Yellow,
 	}
-	d, err := gb.Join("d")
-	if err != nil {
-		fmt.Println(err)
-	}
-	gb.ChooseColor(a, Blue)
-	gb.ChooseColor(b, Green)
-	gb.ChooseColor(c, Yellow)
-	gb.ChooseColor(d, Black)
-	gb.ChoosePartner(a, c)
-	err = gb.Start()
-	if err != nil {
-		t.Fatalf("failed to create gameboard with error %v", err)
+	d := &GamePlayer{
+		id:      dID,
+		partner: bID,
+		name:    "d",
+		color:   Black,
 	}
 
+	gb := NewGameBoard([]*GamePlayer{a, b, c, d})
 	return gb
 }
 
 func Test_goOut(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	players := gb.Players
 
 	for pI, player := range players {
@@ -58,7 +64,7 @@ func Test_goOut(t *testing.T) {
 }
 
 func Test_block(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	players := gb.Players
 	var err error
 
@@ -111,7 +117,7 @@ func Test_block(t *testing.T) {
 }
 
 func Test_quickHome(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	players := gb.Players
 	var err error
 
@@ -187,7 +193,6 @@ func Test_quickHome(t *testing.T) {
 		assertNil(t, err, "move m2 p%d 6 [not blocked]", i)
 
 		assertFalse(t, player.isDone(), "player isDone")
-		assertFalse(t, player.hasWon(), "player hasWon")
 
 		// quickly reajust everyone
 		if err = player.Marbles[0].move(1, true, false); err != nil {
@@ -215,24 +220,16 @@ func Test_quickHome(t *testing.T) {
 		}
 
 		assertFalse(t, player.isDone(), "player isDone")
-		assertFalse(t, player.hasWon(), "player hasWon")
-
 		assertTrue(t, marble.canMove(1, true), "can last marble go into heaven p%d", i)
 		err = marble.move(1, true, false)
 		assertNil(t, err, "last marble go into heaven p%d", i)
 
 		assertTrue(t, player.isDone(), "player p%d isDone", i)
-
-		if i < 2 {
-			assertFalse(t, player.hasWon(), "player hasWon")
-		} else {
-			assertTrue(t, player.hasWon(), "player hasWon")
-		}
 	}
 }
 
 func Test_SendHome(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	// var err error
 
 	a := gb.Players[0].Marbles[3]
@@ -288,7 +285,7 @@ func Test_SendHome(t *testing.T) {
 }
 
 func Test_swap(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	// var err error
 
 	selfA := gb.Players[1].Marbles[1]
@@ -419,7 +416,7 @@ func Test_swap(t *testing.T) {
 }
 
 func Test_max(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 
 	marble1 := gb.Players[0].Marbles[3]
 	marble2 := gb.Players[1].Marbles[3]

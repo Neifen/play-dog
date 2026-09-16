@@ -7,7 +7,7 @@ import (
 )
 
 func Test_Two_Joker(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -45,7 +45,7 @@ func Test_Two_Joker(t *testing.T) {
 }
 
 func Test_Three_Joker(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -83,7 +83,7 @@ func Test_Three_Joker(t *testing.T) {
 }
 
 func Test_FiveA_Joker(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -120,7 +120,7 @@ func Test_FiveA_Joker(t *testing.T) {
 }
 
 func Test_FiveB_Joker(t *testing.T) {
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -161,7 +161,7 @@ func Test_SixA_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Six)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -200,7 +200,7 @@ func Test_SixB_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Six)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -239,7 +239,7 @@ func Test_EightA_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Eight)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -277,7 +277,7 @@ func Test_EightB_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Eight)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -315,7 +315,7 @@ func Test_Nine_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Nine)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -353,7 +353,7 @@ func Test_Ten_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Ten)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -391,7 +391,7 @@ func Test_Queen_Joker(t *testing.T) { //12
 	card := Joker
 	card = card.JockerPickCard(Queen)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -429,7 +429,7 @@ func Test_King_Joker(t *testing.T) { //13
 	card := Joker
 	card = card.JockerPickCard(King)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -467,7 +467,7 @@ func Test_AceOne_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Ace)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -506,7 +506,7 @@ func Test_AceEleven_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Ace)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -544,7 +544,7 @@ func Test_FourBack_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Four)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -582,7 +582,7 @@ func Test_FourForward_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Four)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -622,7 +622,7 @@ func Test_Seven_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Seven)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color
@@ -672,7 +672,7 @@ func Test_Jack_Joker(t *testing.T) {
 	card := Joker
 	card = card.JockerPickCard(Jack)
 
-	gb := setupGame(t)
+	gb := setupGame()
 	firstAfter, secondBefore, thirdHeaven, fourthStart := setupMarbles(gb)
 	firstColor := firstAfter.Player.Color
 	secondColor := secondBefore.Player.Color

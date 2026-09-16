@@ -15,10 +15,6 @@ func (p *Player) isDone() bool {
 	return true
 }
 
-func (p *Player) hasWon() bool {
-	return p.isDone() && p.Partner.isDone()
-}
-
 func (p *Position) moveFrom(m *Marble) error {
 	if p.Marble != m {
 		return fmt.Errorf("Marble %s was not on position %s", m, p)

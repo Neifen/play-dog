@@ -2,183 +2,68 @@ package main
 
 import (
 	"fmt"
-	"math/rand/v2"
-	"play-dog/util"
-	"slices"
+
+	"github.com/google/uuid"
 )
 
 type GameBoard struct {
-	Players         []*Player
-	Sections        []*Section
-	AvailableColors []Color
+	Players  []*Player //todo: find out if needed
+	Sections []*Section
+	// AvailableColors []Color
 
-	playersByName map[string]*Player
+	// playersByName map[string]*Player
 }
 
-func NewGameBoard() *GameBoard {
+func NewGameBoard(gamePlayers []*GamePlayer) *GameBoard {
+	players := make([]*Player, 0, len(gamePlayers))
+	sections := make([]*Section, 0, len(gamePlayers))
+	for _, gamePlayer := range gamePlayers {
+		player := NewPlayer(gamePlayer)
+		players = append(players, player)
+		gamePlayer.boardPlayer = player
+
+		section := NewSection(player)
+		sections = append(sections, section)
+
+		marbles := NewMarbles(player)
+		player.Marbles = marbles
+	}
+
+	linkSections(sections)
+
 	return &GameBoard{
-		playersByName:   make(map[string]*Player),
-		AvailableColors: []Color{Blue, Red, Yellow, Green, White, Black},
+		Players:  players,
+		Sections: sections,
 	}
 }
 
-func (gb *GameBoard) Join(name string) (*Player, error) {
-	player := NewPlayer(name)
-	if _, exists := gb.playersByName[name]; exists {
-		return nil, fmt.Errorf("player with name %s already exists", name)
-	}
-	gb.Players = append(gb.Players, player)
-	gb.playersByName[name] = player
-	return player, nil
-}
+func linkSections(sections []*Section) {
+	playerAmount := len(sections)
 
-func (gb *GameBoard) ChooseColor(player *Player, color Color) error {
-
-	idx := slices.Index(gb.AvailableColors, color)
-	if idx == -1 {
-		return fmt.Errorf("color %s is already picked", color)
-	}
-
-	gb.AvailableColors = slices.Delete(gb.AvailableColors, idx, idx+1)
-	player.Color = color
-	return nil
-}
-
-func (gb *GameBoard) ChoosePartner(one, two *Player) error {
-	if one.Partner != nil {
-		return fmt.Errorf("player %s, already has a partner", one)
-	}
-
-	if two.Partner != nil {
-		return fmt.Errorf("player %s, already has a partner", two)
-	}
-
-	one.Partner = two
-	two.Partner = one
-	return nil
-}
-
-func (gb *GameBoard) Ready() bool {
-	nr := len(gb.Players)
-
-	return nr == 4 || nr == 6
-}
-
-func (gb *GameBoard) Start() error {
-	numberOfPlayers := len(gb.Players)
-
-	if numberOfPlayers != 4 && numberOfPlayers != 6 {
-		return fmt.Errorf("Number of players must be 4 or 6")
-	}
-
-	sections := make([]*Section, numberOfPlayers)
-	partnerless := []*Player{}
-
-	for i, player := range gb.Players {
-		if player.Color == "" {
-			randomIndex := rand.IntN(len(gb.AvailableColors))
-			player.Color = gb.AvailableColors[randomIndex]
-			gb.AvailableColors = slices.Delete(gb.AvailableColors, randomIndex, randomIndex+1)
-		}
-
-		if player.Partner == nil {
-			partnerless = append(partnerless, player)
-		}
-
-		player.Section = NewSection(player)
-		player.Marbles = NewMarbles(player)
-		sections[i] = player.Section
-	}
-
-	// create random partners for the reminding players.
-	for len(partnerless) != 0 {
-		if len(partnerless)%2 != 0 {
-			return fmt.Errorf("Amount of players without a partner is not even: %d", len(partnerless))
-		}
-		one := partnerless[0]
-		two, index := util.RandItemSkipFirst(partnerless)
-
-		one.Partner = two
-		two.Partner = one
-
-		partnerless = slices.Delete(partnerless, index, index+1)
-		partnerless = slices.Delete(partnerless, 0, 1)
-	}
-
-	gb.orderAndLink()
-	return nil
-}
-
-func (gb *GameBoard) orderAndLink() {
-	playerAmount := len(gb.Players)
-	unsortedPlayers := gb.Players
-	sortedPlayers := make([]*Player, playerAmount)
-	sortedSections := make([]*Section, playerAmount)
-
-	index := 0
-	for len(unsortedPlayers) > 0 {
-		if index >= 3 {
-			panic(fmt.Sprintf("something went wrong with ordering players, half of players should not excede 3, was %d", index))
-		}
-		// Player
-		player, playerIndex := util.RandItem(unsortedPlayers)
-		sortedPlayers[index] = player
-		sortedSections[index] = player.Section
-		unsortedPlayers = slices.Delete(unsortedPlayers, playerIndex, playerIndex+1)
-
-		// Partner
-		opositeIndex := (playerAmount / 2) + index
-		partner := player.Partner
-		sortedPlayers[opositeIndex] = partner
-		sortedSections[opositeIndex] = partner.Section
-		unsortedPlayers = slices.DeleteFunc(unsortedPlayers, func(p *Player) bool {
-			if p == nil {
-				return false
-			}
-			return p.ID == partner.ID
-		})
-
-		// 0, 1, 2 (max)
-		index++
-	}
-
-	for i, s := range sortedSections {
+	for i, s := range sections {
 		nextSectionIndex := (i + 1) % playerAmount
-		linkPositions(s.Last, sortedSections[nextSectionIndex].First)
+		linkPositions(s.Last, sections[nextSectionIndex].First)
 	}
-
-	gb.Players = sortedPlayers
-	gb.Sections = sortedSections
 }
-
-type Color string
-
-const (
-	Blue   Color = "BLUE"
-	Red    Color = "RED"
-	Yellow Color = "YELLOW"
-	Green  Color = "GREEN"
-	Black  Color = "BLACK"
-	White  Color = "WHITE"
-)
 
 type Player struct {
-	Name    string
-	ID      int8
-	Color   Color
-	Partner *Player
+	Name  string
+	ID    uuid.UUID
+	Color Color
+	// Partner *Player
 	Marbles Marbles
 	Section *Section
 }
 
 func (p *Player) String() string {
-	return fmt.Sprintf("%s - %s + [%s-%s]", p.Name, p.Color, p.Partner.Name, p.Partner.Color)
+	return fmt.Sprintf("%s[%s]", p.Name, p.Color)
 }
 
-func NewPlayer(name string) *Player {
+func NewPlayer(p *GamePlayer) *Player {
 	return &Player{
-		Name: name,
-		ID:   int8(rand.IntN(64)),
+		Name:  p.name,
+		ID:    p.id,
+		Color: p.color,
 	}
 }
 
@@ -199,6 +84,7 @@ func NewMarbles(player *Player) Marbles {
 		marbles = append(marbles, marble)
 		player.Section.Home[i].Marble = marble
 	}
+
 	return marbles
 }
 
@@ -285,6 +171,7 @@ func NewSection(player *Player) *Section {
 	section.Heaven = heaven
 	section.First = field[0]
 	section.Last = field[len(field)-1]
+	player.Section = section
 
 	return section
 }
