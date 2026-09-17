@@ -18,6 +18,18 @@ func assertEqMsg(t *testing.T, value, expected any, msg string, a ...any) {
 	}
 }
 
+func assertNotEmpty(t *testing.T, value any, msg string, a ...any) {
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
+	case reflect.String, reflect.Array, reflect.Slice, reflect.Map, reflect.Chan:
+		if v.Len() == 0 {
+			t.Errorf("expected %+v to not be empty for: %s", value, fmt.Sprintf(msg, a...))
+		}
+	default:
+		t.Errorf("assertNotEmpty: unsupported type %T", value)
+	}
+}
+
 func assertNeq(t *testing.T, value, expected any) {
 	if value == expected {
 		t.Errorf("expected %+v to be different from %+v", expected, value)

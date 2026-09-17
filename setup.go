@@ -9,9 +9,6 @@ import (
 type GameBoard struct {
 	Players  []*Player //todo: find out if needed
 	Sections []*Section
-	// AvailableColors []Color
-
-	// playersByName map[string]*Player
 }
 
 func NewGameBoard(gamePlayers []*GamePlayer) *GameBoard {
@@ -47,10 +44,9 @@ func linkSections(sections []*Section) {
 }
 
 type Player struct {
-	Name  string
-	ID    uuid.UUID
-	Color Color
-	// Partner *Player
+	Name    string
+	ID      uuid.UUID
+	Color   Color
 	Marbles Marbles
 	Section *Section
 }

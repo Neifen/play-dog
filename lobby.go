@@ -34,7 +34,7 @@ type PlayerSetup struct {
 	Name    string
 	Color   Color
 	Seat    Seat
-	Partner uuid.UUID // resolved, not a pointer — Game rebuilds its own pointers from this
+	Partner uuid.UUID
 }
 
 func (l *Lobby) Start() (*Game, error) {
@@ -43,6 +43,7 @@ func (l *Lobby) Start() (*Game, error) {
 	}
 	l.assignMissingParters()
 	l.assignMissingColors()
+	l.assignSeats()
 	gameSetup, err := l.setupPlayers()
 	if err != nil {
 		return nil, fmt.Errorf("lobby: start failed: %w", err)
@@ -134,7 +135,8 @@ func (l *Lobby) assignMissingColors() {
 	for _, player := range l.players {
 		if player.color == nil {
 			i := rand.IntN(len(l.AvailableColors))
-			player.color = &l.AvailableColors[i]
+			c := l.AvailableColors[i]
+			player.color = &c
 			l.AvailableColors = slices.Delete(l.AvailableColors, i, i+1)
 		}
 	}
@@ -154,7 +156,11 @@ func (l *Lobby) ChooseColor(id uuid.UUID, color Color) error {
 	if idx == -1 {
 		return ErrColorTaken
 	}
-	player := l.players[id]
+	player, ok := l.players[id]
+	if !ok {
+		return fmt.Errorf("%w: player %s", ErrPlayerNotFound, id)
+	}
+
 	prevColor := player.color
 
 	l.AvailableColors = slices.Delete(l.AvailableColors, idx, idx+1)
@@ -168,6 +174,9 @@ func (l *Lobby) ChooseColor(id uuid.UUID, color Color) error {
 }
 
 func (l *Lobby) ChoosePartner(one, two uuid.UUID) error {
+	if one == two {
+		return fmt.Errorf("player %s can not be it's own partner", one)
+	}
 	p1, ok1 := l.players[one]
 	p2, ok2 := l.players[two]
 	if !ok1 {
@@ -182,11 +191,13 @@ func (l *Lobby) ChoosePartner(one, two uuid.UUID) error {
 	}
 
 	// free previous partner
-	prevPartner, ok := l.players[*p1.partner]
-	if !ok {
-		return fmt.Errorf("%w: partner %s for player %s", ErrPlayerNotFound, *p1.partner, one)
+	if p1.partner != nil {
+		prev, ok := l.players[*p1.partner]
+		if !ok {
+			return fmt.Errorf("%w: partner %s for player %s", ErrPlayerNotFound, *p1.partner, one)
+		}
+		prev.partner = nil
 	}
-	prevPartner.partner = nil
 
 	p1.partner = &two
 	p2.partner = &one

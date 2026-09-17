@@ -6,7 +6,53 @@ import (
 	"github.com/google/uuid"
 )
 
+func (g *Game) NextRound() {
+	cards := shuffle(g.deck)
+	handoutCards(round, players, cards)
+}
+
+	handoutCards(round, players, cards)
+
+
+func createDeck() []*ActualCard {
+	deck := make([]*ActualCard, 0, 108) // ?
+	normalCards := 8
+	jokers := 4
+
+	for range normalCards {
+		deck = append(deck, &ActualCard{Ace})
+		deck = append(deck, &ActualCard{Two})
+		deck = append(deck, &ActualCard{Three})
+		deck = append(deck, &ActualCard{Four})
+		deck = append(deck, &ActualCard{Five})
+		deck = append(deck, &ActualCard{Six})
+		deck = append(deck, &ActualCard{Seven})
+		deck = append(deck, &ActualCard{Eight})
+		deck = append(deck, &ActualCard{Nine})
+		deck = append(deck, &ActualCard{Ten})
+		deck = append(deck, &ActualCard{Jack})
+		deck = append(deck, &ActualCard{Queen})
+		deck = append(deck, &ActualCard{King})
+	}
+
+	for range jokers {
+		deck = append(deck, &ActualCard{Joker})
+	}
+
+	return deck
+}
+
+func shuffle(deck []*ActualCard) []*ActualCard {
+	rand.Shuffle(len(deck), func(i, j int) { deck[i], deck[j] = deck[j], deck[i] })
+	return deck
+}
+
+type ActualCard struct {
+	Card Card
+}
+
 type Game struct {
+	deck      []*ActualCard
 	players   []*GamePlayer
 	turn      int
 	round     *GameRound
@@ -24,6 +70,7 @@ func NewGame(setups []*PlayerSetup) *Game {
 			id:      setup.ID,
 			partner: setup.Partner,
 			name:    setup.Name,
+			color:   setup.Color,
 		}
 		players[setup.Seat] = player
 		playersMap[setup.ID] = player
@@ -32,11 +79,15 @@ func NewGame(setups []*PlayerSetup) *Game {
 	gb := NewGameBoard(players)
 	turn := rand.IntN(playerAmount)
 	round := &GameRound{starts: players[turn], deckSize: 6}
+
+	deck := createDeck()
 	return &Game{
-		gameBoard: gb,
-		players:   players,
-		turn:      turn,
-		round:     round,
+		gameBoard:  gb,
+		players:    players,
+		playersMap: playersMap,
+		turn:       turn,
+		round:      round,
+		deck:       deck,
 	}
 }
 
