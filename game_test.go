@@ -47,7 +47,7 @@ func Test_GameSetup(t *testing.T) {
 	assertNotNil(t, game, "new game")
 	assertEq(t, len(game.players), 4)
 	assertEq(t, len(game.playersMap), 4)
-	assertEq(t, game.round.starts.id, game.players[game.turn].id)
+	assertEq(t, game.round.startsTurn, game.turn)
 	assertEq(t, game.round.deckSize, 6)
 
 	assertEq(t, game.players[0].id, aID)

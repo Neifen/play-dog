@@ -4,6 +4,7 @@ import "fmt"
 
 type Move interface {
 	act() error
+	position() *Position
 }
 
 type MoveSwap struct {
@@ -16,10 +17,15 @@ func (s MoveSwap) act() error {
 	return s.self.swap(s.other)
 }
 
+func (s MoveSwap) position() *Position {
+	return s.other.Position
+}
+
 type MoveSeven struct {
 	marble      *Marble
 	heaven      bool
 	chosenSteps int
+	pos         *Position
 }
 
 // act implements [Move].
@@ -27,15 +33,24 @@ func (s MoveSeven) act() error {
 	return s.marble.move(s.chosenSteps, s.heaven, true)
 }
 
+func (s MoveSeven) position() *Position {
+	return s.pos
+}
+
 type MoveSteps struct {
 	marble *Marble
 	heaven bool
 	amount int
+	pos    *Position
 }
 
 // act implements [Move].
 func (s MoveSteps) act() error {
 	return s.marble.move(s.amount, s.heaven, false)
+}
+
+func (s MoveSteps) position() *Position {
+	return s.pos
 }
 
 type LeaveHome struct {
@@ -45,6 +60,10 @@ type LeaveHome struct {
 // act implements [Move].
 func (l LeaveHome) act() error {
 	return l.marble.goOut()
+}
+
+func (l LeaveHome) position() *Position {
+	return l.marble.Position.NextPosition
 }
 
 type CardAction interface {
@@ -143,8 +162,8 @@ func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 
 	for i := range a.stepsLeft {
 		steps := i + 1
-		canMoveHeaven := m.canMove(steps, true)
-		canMove := m.canMove(steps, false)
+		canMoveHeaven, posHeaven := m.canMove(steps, true)
+		canMove, pos := m.canMove(steps, false)
 		if !canMove && !canMoveHeaven {
 			continue // no need to figure out `canFill` -> expensive
 		}
@@ -152,11 +171,11 @@ func (a splitAction) LegalMoves(_ *GameBoard, m *Marble, c Card) []Move {
 		left := a.stepsLeft - steps
 		canFill := maxMoves(m.Player.Marbles, m, left) >= left
 		if canFill && canMoveHeaven {
-			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: true})
+			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: true, pos: posHeaven})
 		}
 
 		if canFill && canMove {
-			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: false})
+			moves = append(moves, MoveSeven{marble: m, chosenSteps: steps, heaven: false, pos: pos})
 		}
 	}
 	return moves
@@ -181,12 +200,14 @@ func (_ moveAction) LegalMoves(_ *GameBoard, m *Marble, card Card) []Move {
 	}
 
 	for _, places := range card.Moves {
-		if m.canMove(places, true) {
-			moves = append(moves, MoveSteps{marble: m, amount: places, heaven: true})
+		canMoveHeaven, posHeaven := m.canMove(places, true)
+		if canMoveHeaven {
+			moves = append(moves, MoveSteps{marble: m, amount: places, heaven: true, pos: posHeaven})
 		}
 
-		if m.canMove(places, false) {
-			moves = append(moves, MoveSteps{marble: m, amount: places, heaven: false})
+		canMove, pos := m.canMove(places, false)
+		if canMove {
+			moves = append(moves, MoveSteps{marble: m, amount: places, heaven: false, pos: pos})
 		}
 	}
 	return moves

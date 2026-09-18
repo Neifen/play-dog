@@ -106,29 +106,29 @@ func (m *Marble) isBlocking() bool {
 	return m.StartTouches == 1 && m.Position.PositionType == Start
 }
 
-func (m *Marble) canMove(places int, heaven bool) bool {
+func (m *Marble) canMove(places int, heaven bool) (bool, *Position) {
 	backwards := places < 0
 	if backwards && heaven {
-		return false // can walk back into heaven
+		return false, nil // can walk back into heaven
 	}
 
 	next := m.Position
 	startTouches := m.StartTouches
 
 	if backwards && !next.onBoard() {
-		return false // can walk back when not on the board
+		return false, nil // can walk back when not on the board
 	}
 
 	abs := int(math.Abs(float64(places)))
 	for range abs {
 		if heaven && next.AltNextPosition != nil && next.Section == m.Player.Section {
 			if startTouches < 2 {
-				return false
+				return false, nil
 			}
 			next = next.AltNextPosition
 		} else if places > 0 {
 			if next.NextPosition == nil {
-				return false // end of heaven
+				return false, nil // end of heaven
 			}
 
 			next = next.NextPosition
@@ -137,7 +137,7 @@ func (m *Marble) canMove(places int, heaven bool) bool {
 		}
 
 		if next.Marble != nil && next.Marble.isBlocking() {
-			return false
+			return false, nil
 		}
 
 		if next.PositionType == Start {
@@ -147,12 +147,12 @@ func (m *Marble) canMove(places int, heaven bool) bool {
 
 	// needed in order to get right amount of moves in cards.go
 	if heaven && next.PositionType != Heaven {
-		return false
+		return false, nil
 	} else if !heaven && next.PositionType == Heaven {
-		return false
+		return false, nil
 	}
 
-	return true
+	return true, next
 }
 
 func (m *Marble) swap(other *Marble) error {

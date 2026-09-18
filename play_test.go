@@ -85,11 +85,13 @@ func Test_block(t *testing.T) {
 	// move 8 (y), then 8 (n) blocked
 	for i, player := range players {
 		marble := player.Marbles[0]
-		assertFalse(t, marble.canMove(8, true), "marble for p%d 'canMove(8, true[heaven])", i) //heaven
+		canMoveH, _ := marble.canMove(8, true)
+		assertFalse(t, canMoveH, "marble for p%d 'canMove(8, true[heaven])", i) //heaven
 		err := marble.move(8, true, false)
 		assertNotNil(t, err, "move marble 8[heaven] for p%d", i) // because it can't go into heaven there before touching start twice
 
-		assertTrue(t, marble.canMove(8, false), "marble for p%d 'canMove(8, false[heaven])", i)
+		canMove, _ := marble.canMove(8, false)
+		assertTrue(t, canMove, "marble for p%d 'canMove(8, false[heaven])", i)
 		err = marble.move(8, false, false)
 		assertNil(t, err, "move marble 8 for p%d", i)
 
@@ -97,7 +99,8 @@ func Test_block(t *testing.T) {
 		if i == 3 {
 			continue // last one is not blocked, just skip
 		}
-		assertFalse(t, marble.canMove(8, false), "marble for p%d 'canMove(8, false[heaven])", i) //blocking
+		canMove, _ = marble.canMove(8, false)
+		assertFalse(t, canMove, "marble for p%d 'canMove(8, false[heaven])", i) //blocking
 		err = marble.move(8, false, false)
 		assertNotNil(t, err, "move marble 8 for p%d", i) // because its blocked
 	}
@@ -105,7 +108,8 @@ func Test_block(t *testing.T) {
 	// move 8 again (y)
 	for i, player := range players {
 		marble := player.Marbles[0]
-		assertTrue(t, marble.canMove(8, false), "marble for p%d 'canMove(8, false[heaven])", i)
+		canMove, _ := marble.canMove(8, false)
+		assertTrue(t, canMove, "marble for p%d 'canMove(8, false[heaven])", i)
 		err = marble.move(8, false, false)
 		assertNil(t, err, "move marble 8 for p%d", i)
 
@@ -127,23 +131,28 @@ func Test_quickHome(t *testing.T) {
 		err = marble.goOut()
 		assertNil(t, err, "gm1 o out p%d", i)
 
-		assertFalse(t, marble.canMove(-4, true), "move m1 p%d back 4 [heaven]", i)
+		canMove, _ := marble.canMove(-4, true)
+		assertFalse(t, canMove, "move m1 p%d back 4 [heaven]", i)
 		err = marble.move(-4, true, false)
 		assertNotNil(t, err, "move m1 p%d 4 back [heaven]", i)
 
-		assertTrue(t, marble.canMove(-4, false), "move m1 p%d back 4", i)
+		canMove, _ = marble.canMove(-4, false)
+		assertTrue(t, canMove, "move m1 p%d back 4", i)
 		err = marble.move(-4, false, false)
 		assertNil(t, err, "move m1 p%d 4 back", i)
 
 		// trying to move marble into heaven but not actually
-		assertFalse(t, marble.canMove(2, true), "cant move m1 p%d 2 into heaven, its not heaven there", i)
+		canMove, _ = marble.canMove(2, true)
+		assertFalse(t, canMove, "cant move m1 p%d 2 into heaven, its not heaven there", i)
 		assertNotNil(t, marble.move(2, true, false), "cant move m1 p%d 2 into heaven, its not heaven there", i)
 
 		// trying to move marble past heaven
-		assertFalse(t, marble.canMove(9, true), "cant move m1 p%d 9 into heaven", i)
+		canMove, _ = marble.canMove(9, true)
+		assertFalse(t, canMove, "cant move m1 p%d 9 into heaven", i)
 		assertNotNil(t, marble.move(9, true, false), "cant move m1 p%d 9 into heaven", i)
 
-		assertTrue(t, marble.canMove(7, true), "move m1 p%d 7 into heaven", i)
+		canMove, _ = marble.canMove(7, true)
+		assertTrue(t, canMove, "move m1 p%d 7 into heaven", i)
 		err = marble.move(7, true, false)
 		assertNil(t, err, "move m1 p%d 7 into heaven", i)
 
@@ -156,7 +165,8 @@ func Test_quickHome(t *testing.T) {
 		err = marble.goOut()
 		assertNil(t, err, "m2 go out p%d", i)
 
-		assertTrue(t, marble.canMove(-4, false), "move m2 p%d back 4", i)
+		canMove, _ = marble.canMove(-4, false)
+		assertTrue(t, canMove, "move m2 p%d back 4", i)
 		err = marble.move(-4, false, false)
 		assertNil(t, err, "move m2 p%d 4 back", i)
 
@@ -167,28 +177,34 @@ func Test_quickHome(t *testing.T) {
 
 		// second marble (blocked)
 		marble = player.Marbles[1]
-		assertFalse(t, marble.canMove(6, true), "move m2 p%d 6 into heaven [blocked]", i)
+		canMove, _ = marble.canMove(6, true)
+		assertFalse(t, canMove, "move m2 p%d 6 into heaven [blocked]", i)
 		err = marble.move(6, true, false)
 		assertNotNil(t, err, "move m2 p%d 6 into heaven [blocked]", i)
 
-		assertFalse(t, marble.canMove(6, false), "move m2 p%d 4 [blocked]", i)
+		canMove, _ = marble.canMove(6, false)
+		assertFalse(t, canMove, "move m2 p%d 4 [blocked]", i)
 		err = marble.move(6, false, false)
 		assertNotNil(t, err, "move m2 p%d 6 [blocked]", i)
 
 		// third marble (move a bit)
 		marble = player.Marbles[2]
-		assertTrue(t, marble.canMove(2, false), "move m3 p%d 2 [unblocking]", i)
+		canMove, _ = marble.canMove(2, false)
+		assertTrue(t, canMove, "move m3 p%d 2 [unblocking]", i)
 		err = marble.move(2, false, false)
 		assertNil(t, err, "move m3 p%d 2 [unblocking]", i)
 
 		// second marble (not blocked anymore, but heaven is partly blocked)
 		marble = player.Marbles[1]
-		assertFalse(t, marble.canMove(7, true), "move m2 p%d 7 into heaven [heaven-blocked]", i)
+		canMove, _ = marble.canMove(7, true)
+		assertFalse(t, canMove, "move m2 p%d 7 into heaven [heaven-blocked]", i)
 		err = marble.move(7, true, false)
 		assertNotNil(t, err, "move m2 p%d 7 into heaven [heaven-blocked]", i)
 
-		assertTrue(t, marble.canMove(6, false), "can move m2 p%d 6 [unblocked]", i)
-		assertTrue(t, marble.canMove(6, true), "move m2 p%d 6 into heaven [unblocked]", i)
+		canMove, _ = marble.canMove(6, false)
+		assertTrue(t, canMove, "can move m2 p%d 6 [unblocked]", i)
+		canMove, _ = marble.canMove(6, true)
+		assertTrue(t, canMove, "move m2 p%d 6 into heaven [unblocked]", i)
 		err = marble.move(6, true, false)
 		assertNil(t, err, "move m2 p%d 6 [not blocked]", i)
 
@@ -220,7 +236,8 @@ func Test_quickHome(t *testing.T) {
 		}
 
 		assertFalse(t, player.isDone(), "player isDone")
-		assertTrue(t, marble.canMove(1, true), "can last marble go into heaven p%d", i)
+		canMove, _ = marble.canMove(1, true)
+		assertTrue(t, canMove, "can last marble go into heaven p%d", i)
 		err = marble.move(1, true, false)
 		assertNil(t, err, "last marble go into heaven p%d", i)
 
